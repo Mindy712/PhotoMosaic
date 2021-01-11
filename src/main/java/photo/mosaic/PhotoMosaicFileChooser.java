@@ -8,19 +8,23 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class FileChooser {
+public class PhotoMosaicFileChooser {
     private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView());
     private final int minNumTiles = 100;
     private JPanel errorPanel;
     private String backgroundImagePath;
     private String tilesPath;
     private int numTiles;
+    private JTextField filePath;
+    private JTextField folderPath;
 
-    public void setErrorPanel(JPanel errorPanel) {
+    public void setUIElements(JPanel errorPanel, JTextField filePath, JTextField folderPath) {
         this.errorPanel = errorPanel;
+        this.filePath = filePath;
+        this.folderPath = folderPath;
     }
 
-    public void chooseFile(JTextField textField) {
+    public void chooseFile() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "png", "gif", "jpeg");
         fileChooser.setFileFilter(filter);
         int file = fileChooser.showOpenDialog(null);
@@ -28,29 +32,29 @@ public class FileChooser {
 
         {
             // set the label to the path of the selected file
-            textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+            filePath.setText(fileChooser.getSelectedFile().getAbsolutePath());
             setBackgroundImagePath(fileChooser.getSelectedFile().getAbsolutePath());
         }
     }
 
-    public void chooseFolder(JTextField textField) {
+    public void chooseFolder() {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int folder = fileChooser.showOpenDialog(null);
         if (folder == JFileChooser.APPROVE_OPTION &&
                 fileChooser.getSelectedFile().list().length >= minNumTiles &&
-                directoryHas1000Images(new File(fileChooser.getSelectedFile().getAbsolutePath())))
+                directoryHas100Images(new File(fileChooser.getSelectedFile().getAbsolutePath())))
         {
             // set the label to the path of the selected file
-            textField.setText(fileChooser.getSelectedFile().getAbsolutePath());
+            folderPath.setText(fileChooser.getSelectedFile().getAbsolutePath());
             setTilesPath(fileChooser.getSelectedFile().getAbsolutePath());
         }
         else
         {
-            JOptionPane.showMessageDialog(errorPanel, "Please select a folder with at least 1,000 images.");
+            JOptionPane.showMessageDialog(errorPanel, "Please select a folder with at least 100 images.");
         }
     }
 
-    private boolean directoryHas1000Images(File tileDirectory) {
+    private boolean directoryHas100Images(File tileDirectory) {
         int total = 0;
         for (File file : tileDirectory.listFiles()) {
             if (file.isFile() &&
@@ -62,7 +66,7 @@ public class FileChooser {
                 total++;
             }
         }
-        if (total >= 1000) {
+        if (total >= 100) {
             numTiles = total;
             return true;
         }
@@ -92,10 +96,25 @@ public class FileChooser {
     }
 
     public boolean pathsAreValid() {
-        File bg = new File(getBackgroundImagePath());
-        File tiles = new File(getTilesPath());
+        File bg;
+        File tiles;
+        if (getBackgroundImagePath() != null) {
+            bg = new File(getBackgroundImagePath());
+        }
+        else {
+            backgroundImagePath = filePath.getText();
+            bg = new File(backgroundImagePath);
+        }
 
-        if (bg.isFile() && tiles.isDirectory() && directoryHas1000Images(tiles)) {
+        if (getTilesPath() != null) {
+            tiles = new File(getTilesPath());
+        }
+        else {
+            tilesPath = folderPath.getText();
+            tiles = new File(tilesPath);
+        }
+
+        if (bg.isFile() && tiles.isDirectory() && directoryHas100Images(tiles)) {
             return true;
         }
         else {
@@ -116,12 +135,14 @@ public class FileChooser {
                 File selectedFile = fileChooser.getSelectedFile();
 
                 try {
-                    String fileName = selectedFile.getCanonicalPath();
-                    if (!fileName.endsWith(".png")) {
-                        selectedFile = new File(fileName + ".png");
+                    String fileName = selectedFile.getAbsolutePath();
+                    if (fileName.contains(".")) {
+                        fileName = fileName.substring(0, fileName.indexOf("."));
                     }
+                    selectedFile = new File(fileName + ".png");
                     ImageIO.write(photoMosaic, "png", selectedFile);
                 } catch (IOException e) {
+                    JOptionPane.showMessageDialog(errorPanel, "Something went wrong.\nPlease try again.");
                     e.printStackTrace();
                 }
             }

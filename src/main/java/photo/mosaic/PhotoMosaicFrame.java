@@ -3,22 +3,23 @@ package photo.mosaic;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.CountDownLatch;
 
-public class Frame extends JFrame {
+public class PhotoMosaicFrame extends JFrame {
     private JPanel errorPanel = new JPanel();
-    private final FileChooser fileChooser;
+    private final PhotoMosaicFileChooser fileChooser;
     private Controller controller;
+//    private PhotoMosaicThread thread;
     private JTextField backgroundImagePath;
     private JTextField tilesPath;
     private BufferedImage photoMosaic;
     private JPanel imagePanel;
 
-    public Frame(FileChooser fileChooser, Controller controller) {
+    public PhotoMosaicFrame(PhotoMosaicFileChooser fileChooser, Controller controller) {
         super();
 
         this.fileChooser = fileChooser;
         this.controller = controller;
+//        this.thread = thread;
 
         setSize(1000, 800);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -29,7 +30,8 @@ public class Frame extends JFrame {
         setUpFilesPanel(filesPanel);
         add(filesPanel, BorderLayout.NORTH);
 
-        fileChooser.setErrorPanel(errorPanel);
+        fileChooser.setUIElements(errorPanel, backgroundImagePath, tilesPath);
+        controller.setErrorPanel(errorPanel);
         add(errorPanel);
 
         imagePanel = new JPanel();
@@ -39,6 +41,8 @@ public class Frame extends JFrame {
         JPanel buttonPanel = new JPanel();
         setUpButtonPanel(buttonPanel);
         add(buttonPanel, BorderLayout.SOUTH);
+
+//        thread.setImagePanel(imagePanel);
     }
 
     private void setUpFilesPanel(JPanel filesPanel) {
@@ -58,12 +62,12 @@ public class Frame extends JFrame {
         filesPanel.add(backgroundImagePath, constraints);
 
         JButton browseBackgroundImage = new JButton("Browse");
-        browseBackgroundImage.addActionListener(actionEvent -> fileChooser.chooseFile(backgroundImagePath));
+        browseBackgroundImage.addActionListener(actionEvent -> fileChooser.chooseFile());
         constraints.gridx = 10;
         constraints.gridy = 1;
         filesPanel.add(browseBackgroundImage, constraints);
 
-        JLabel tilesLabel = new JLabel("Please select a folder with the tiles you would like (1000 minimum): ");
+        JLabel tilesLabel = new JLabel("Please select a folder with the tiles you would like (100 minimum): ");
         constraints.gridx = 0;
         constraints.gridy = 2;
         filesPanel.add(tilesLabel, constraints);
@@ -76,7 +80,7 @@ public class Frame extends JFrame {
         filesPanel.add(tilesPath, constraints);
 
         JButton browseTiles = new JButton("Browse");
-        browseTiles.addActionListener(actionEvent -> fileChooser.chooseFolder(tilesPath));
+        browseTiles.addActionListener(actionEvent -> fileChooser.chooseFolder());
         constraints.gridx = 10;
         constraints.gridy = 3;
         filesPanel.add(browseTiles, constraints);
@@ -89,10 +93,6 @@ public class Frame extends JFrame {
     }
 
     private void setUpButtonPanel(JPanel buttonPanel) {
-        buttonPanel.setLayout(new GridLayout());
-        JButton regenerate = new JButton("Regenerate");
-        regenerate.addActionListener(actionEvent -> regenerate());
-        buttonPanel.add(regenerate);
         JButton save = new JButton("Save");
         save.addActionListener(actionEvent -> fileChooser.save(photoMosaic));
         buttonPanel.add(save);
@@ -113,24 +113,16 @@ public class Frame extends JFrame {
         }
     }
 
-    private void regenerate() {
-        if (photoMosaic == null) {
-            JOptionPane.showMessageDialog(errorPanel,
-                    "First generate a photo mosaic.");
-        }
-        else {
-            displayInImagePanel();
-        }
-    }
-
     private void displayInImagePanel() {
+//        PhotoMosaicThread thread = new PhotoMosaicThread(this, imagePanel, controller, photoMosaic);
+//        thread.start();
+//        thread.setShouldUpdate(true);
         JLabel loading = new JLabel("Something great is coming your way!");
         imagePanel.add(loading, BorderLayout.CENTER);
-        repaint();
         photoMosaic = controller.getPhotoMosaic();
         JLabel pictureLabel = new JLabel(new ImageIcon(photoMosaic));
         imagePanel.remove(loading);
         imagePanel.add(pictureLabel, BorderLayout.CENTER);
-        repaint();
+//        thread.setShouldUpdate(false);
     }
 }

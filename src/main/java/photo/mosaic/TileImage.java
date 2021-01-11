@@ -1,21 +1,21 @@
 package photo.mosaic;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 public class TileImage {
-    private double meanColor;
+    private Color meanColor;
     private BufferedImage tile;
 
     public BufferedImage getTile() {
         return tile;
     }
 
-    public double getMeanColor() {
+    public Color getMeanColor() {
         return meanColor;
     }
 
-    public TileImage(double meanColor, BufferedImage tile) {
+    public TileImage(Color meanColor, BufferedImage tile) {
         this.meanColor = meanColor;
         this.tile = tile;
     }

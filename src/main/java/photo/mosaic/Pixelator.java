@@ -1,103 +1,137 @@
 package photo.mosaic;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
+//explain
 public class Pixelator {
-    private int rows = 50;
-    private int cols = 50;
-    private int heightPixel;
-    private int widthPixel;
+    private ArrayList<Integer> reds = new ArrayList<>();
+    private ArrayList<Integer> greens = new ArrayList<>();
+    private ArrayList<Integer> blues = new ArrayList<>();
+    private JPanel errorPanel;
+    private int widthOfPixelBg;
+    private int heightOfPixelBg;
+    private final int pixelsInWidthBg = 50;
+    private final int pixelsInHeightBg = 50;
 
-    public Pixelator() {
+    public void setErrorPanel(JPanel errorPanel) {
+        this.errorPanel = errorPanel;
     }
 
-    public Pixelator(int numPics) {
-        setRowsAndCols(numPics);
+    public int getWidthOfPixelBg() {
+        return widthOfPixelBg;
     }
 
-    private void setRowsAndCols(int numPics) {
-        if (numPics / 2 != 0) {
-            numPics--;
-        }
-        this.rows = (int) Math.ceil(Math.sqrt(numPics));
-        this.cols = (int) Math.floor(Math.sqrt(numPics));
+    private void setWidthOfPixelBg(int widthOfPixelBg) {
+        this.widthOfPixelBg = widthOfPixelBg;
     }
 
-    public int getRows() {
-        return rows;
+    public int getHeightOfPixelBg() {
+        return heightOfPixelBg;
     }
 
-    public int getCols() {
-        return cols;
+    private void setHeightOfPixelBg(int heightOfPixelBg) {
+        this.heightOfPixelBg = heightOfPixelBg;
     }
 
-    public int[][] pixelate(BufferedImage image) {
-        setHeightPixel(image);
-        setWidthPixel(image);
-
-        int[][] pixels = getPixels(image);
+    public PixelInBackgroundImage[][] pixelateBgImage(BufferedImage image) {
+        PixelInBackgroundImage[][] pixels = getBgImageArray(image);
         return pixels;
     }
 
-    public TileImage pixelate(File imageFile) {
+    public TileImage pixelateTile(File imageFile) {
         BufferedImage image = null;
         try {
             image = ImageIO.read(imageFile);
-        } catch (IOException e) {
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(errorPanel, "Something went wrong.\nPlease try again.");
             e.printStackTrace();
         }
-        setHeightPixel(image);
-        setWidthPixel(image);
-        int[][] pixels = getPixels(image);
-        double average = getAverage(pixels);
+        int width = image.getWidth();
+        int height = image.getHeight();
+        Color average = getAverage(image, width, height, 0, 0);
 
         return new TileImage(average, image);
     }
 
-    private void setHeightPixel(BufferedImage image) {
-        int bgHeight = image.getHeight();
-        heightPixel = bgHeight / cols;
-    }
+    private PixelInBackgroundImage[][] getBgImageArray(BufferedImage image) {
+        PixelInBackgroundImage[][] pixels = new PixelInBackgroundImage[pixelsInWidthBg][pixelsInHeightBg];
 
-    private void setWidthPixel(BufferedImage image) {
-        int bgWidth = image.getWidth();
-        widthPixel = bgWidth / rows;
-    }
-
-
-    public int getHeightPixel() {
-        return heightPixel;
-    }
-
-    public int getWidthPixel() {
-        return widthPixel;
-    }
-
-    private int[][] getPixels(BufferedImage image) {
-        int[][] pixels = new int[rows][cols];
-
-        for (int row = 0; row < rows; row++){
-            for (int col = 0; col < cols; col++) {
-                pixels[row][col] = image.getRGB((row * widthPixel) + (widthPixel / 2),
-                        (col * heightPixel) + (heightPixel / 2));
+        for (int pixelUpToWidth = 0; pixelUpToWidth < pixelsInWidthBg; pixelUpToWidth++){
+            for (int pixelUpToHeight = 0; pixelUpToHeight < pixelsInHeightBg; pixelUpToHeight++) {
+                Color color = getAverage(image, widthOfPixelBg, heightOfPixelBg, pixelUpToWidth, pixelUpToHeight);
+                pixels[pixelUpToWidth][pixelUpToHeight] = new PixelInBackgroundImage(pixelUpToWidth, pixelUpToHeight, color);
             }
         }
         return pixels;
     }
 
-    private double getAverage(int[][] pixels) {
-        double total = 0.0;
-        double sum = 0.0;
-        for (int row = 0; row < pixels.length; row ++) {
-            for (int col = 0; col < pixels[row].length; col++) {
-                sum += pixels[row][col];
-                total++;
+    private Color getAverage(BufferedImage image, int width, int height, int offsetWidth, int offsetHeight) {
+        int[][] pixels = new int[width][height];
+
+        for (int x = 0; x < width; x++){
+            for (int y = 0; y < height; y++) {
+                pixels[x][y] = image.getRGB(x + (width * offsetWidth), y + (height * offsetHeight));
             }
+            
         }
-        return sum / total;
+
+        return calculateAverageColor(pixels);
     }
 
+    private Color calculateAverageColor(int[][] pixels) {
+        reds.clear();
+        greens.clear();
+        blues.clear();
+        for (int row = 0; row < pixels.length; row ++) {
+            for (int col = 0; col < pixels[row].length; col++) {
+                Color color = new Color(pixels[row][col]);
+                reds.add(color.getRed());
+                greens.add(color.getGreen());
+                blues.add(color.getBlue());
+            }
+        }
+
+        int total = reds.size();
+        int sumReds = 0;
+        int sumGreens = 0;
+        int sumBlues = 0;
+
+        for (int ix = 0; ix < total; ix++) {
+            sumReds += reds.get(ix);
+            sumGreens += greens.get(ix);
+            sumBlues += blues.get(ix);
+        }
+
+        int red = sumReds / total;
+        int green = sumGreens / total;
+        int blue = sumBlues / total;
+
+        return new Color(red, green, blue);
+    }
+
+    public BufferedImage resizeBackgroundImage(String imagePath) {
+        BufferedImage bufferedImg = null;
+        try {
+            BufferedImage image = ImageIO.read(new File(imagePath));
+            int widthOfBgImage = image.getWidth();
+            int heightOfBgImage = image.getHeight();
+            setWidthOfPixelBg(widthOfBgImage / pixelsInWidthBg);
+            setHeightOfPixelBg(heightOfBgImage / pixelsInHeightBg);
+            int width = widthOfPixelBg * pixelsInWidthBg;
+            int height = heightOfPixelBg * pixelsInHeightBg;
+            Image resizedImg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+            bufferedImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            bufferedImg.getGraphics().drawImage(resizedImg, 0, 0 , null);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(errorPanel, "Something went wrong.\nPlease try again.");
+            e.printStackTrace();
+        }
+        return bufferedImg;
+    }
 }
