@@ -8,16 +8,25 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-//explain
+/**
+ * Pixelator class takes an image and gets the RGB values for the pixels of that image
+ */
 public class Pixelator {
+    private JPanel errorPanel;
+
+    //width and height of a pixel in the background image
+    private int widthOfPixelBg;
+    private int heightOfPixelBg;
+
+    //number of pixels in both the width and height of the background image
+    private final int pixelsInWidthBg = 50;
+    private final int pixelsInHeightBg = 50;
+
+    //Arraylists used to store the reds, greens, and blues of all the pixels in the image
+    //Used to find the average color
     private ArrayList<Integer> reds = new ArrayList<>();
     private ArrayList<Integer> greens = new ArrayList<>();
     private ArrayList<Integer> blues = new ArrayList<>();
-    private JPanel errorPanel;
-    private int widthOfPixelBg;
-    private int heightOfPixelBg;
-    private final int pixelsInWidthBg = 50;
-    private final int pixelsInHeightBg = 50;
 
     public void setErrorPanel(JPanel errorPanel) {
         this.errorPanel = errorPanel;
@@ -37,6 +46,34 @@ public class Pixelator {
 
     private void setHeightOfPixelBg(int heightOfPixelBg) {
         this.heightOfPixelBg = heightOfPixelBg;
+    }
+
+    /**
+     * @param imagePath
+     *
+     * Resize background image based on how many pixels there are and the size of the pixels.
+     * Needed because otherwise a full pixel cannot necessarily be made and then the side/bottom of the image
+     *      won't be pixelated.
+     * @return resized background image
+     */
+    public BufferedImage resizeBackgroundImage(String imagePath) {
+        BufferedImage bufferedImg = null;
+        try {
+            BufferedImage image = ImageIO.read(new File(imagePath));
+            int widthOfBgImage = image.getWidth();
+            int heightOfBgImage = image.getHeight();
+            setWidthOfPixelBg(widthOfBgImage / pixelsInWidthBg);
+            setHeightOfPixelBg(heightOfBgImage / pixelsInHeightBg);
+            int width = widthOfPixelBg * pixelsInWidthBg;
+            int height = heightOfPixelBg * pixelsInHeightBg;
+            Image resizedImg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
+            bufferedImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            bufferedImg.getGraphics().drawImage(resizedImg, 0, 0 , null);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(errorPanel, "Something went wrong.\nPlease try again.");
+            e.printStackTrace();
+        }
+        return bufferedImg;
     }
 
     public PixelInBackgroundImage[][] pixelateBgImage(BufferedImage image) {
@@ -59,6 +96,10 @@ public class Pixelator {
         return new TileImage(average, image);
     }
 
+    /**
+     * @param image - background image
+     * @return Array of PixelInBackroungImage - the background image pixelated into pixelsInWidthBg x pixelsInHeightBg
+     */
     private PixelInBackgroundImage[][] getBgImageArray(BufferedImage image) {
         PixelInBackgroundImage[][] pixels = new PixelInBackgroundImage[pixelsInWidthBg][pixelsInHeightBg];
 
@@ -71,6 +112,14 @@ public class Pixelator {
         return pixels;
     }
 
+    /**
+     * @param image - image to get average color
+     * @param width - width of image to get average of, or width of pixel if only want part of the image
+     * @param height - height of image to get average of, or width of pixel if only want part of the image
+     * @param offsetWidth - offset in image of where to get the average from (needed when looking for only part)
+     * @param offsetHeight - offset in image of where to get the average from (needed when looking for only part)
+     * @return Color that is the average color of the given image/image part
+     */
     private Color getAverage(BufferedImage image, int width, int height, int offsetWidth, int offsetHeight) {
         int[][] pixels = new int[width][height];
 
@@ -84,6 +133,12 @@ public class Pixelator {
         return calculateAverageColor(pixels);
     }
 
+    /**
+     * @param pixels - array of pixels with color to get average from
+     *
+     * Calculates the average reds, greens, and blues
+     * @return Color based on the averages calculated
+     */
     private Color calculateAverageColor(int[][] pixels) {
         reds.clear();
         greens.clear();
@@ -113,25 +168,5 @@ public class Pixelator {
         int blue = sumBlues / total;
 
         return new Color(red, green, blue);
-    }
-
-    public BufferedImage resizeBackgroundImage(String imagePath) {
-        BufferedImage bufferedImg = null;
-        try {
-            BufferedImage image = ImageIO.read(new File(imagePath));
-            int widthOfBgImage = image.getWidth();
-            int heightOfBgImage = image.getHeight();
-            setWidthOfPixelBg(widthOfBgImage / pixelsInWidthBg);
-            setHeightOfPixelBg(heightOfBgImage / pixelsInHeightBg);
-            int width = widthOfPixelBg * pixelsInWidthBg;
-            int height = heightOfPixelBg * pixelsInHeightBg;
-            Image resizedImg = image.getScaledInstance(width, height, java.awt.Image.SCALE_SMOOTH);
-            bufferedImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            bufferedImg.getGraphics().drawImage(resizedImg, 0, 0 , null);
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(errorPanel, "Something went wrong.\nPlease try again.");
-            e.printStackTrace();
-        }
-        return bufferedImg;
     }
 }

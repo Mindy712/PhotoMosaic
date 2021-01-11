@@ -4,19 +4,22 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class TileImage {
-    private Color meanColor;
+    //Average color of this tile
+    private Color averageColor;
+
+    //Image that is this this tile
     private BufferedImage tile;
 
     public BufferedImage getTile() {
         return tile;
     }
 
-    public Color getMeanColor() {
-        return meanColor;
+    public Color getAverageColor() {
+        return averageColor;
     }
 
     public TileImage(Color meanColor, BufferedImage tile) {
-        this.meanColor = meanColor;
+        this.averageColor = meanColor;
         this.tile = tile;
     }
 }

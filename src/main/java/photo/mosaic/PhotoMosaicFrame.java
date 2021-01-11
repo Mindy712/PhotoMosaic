@@ -12,7 +12,7 @@ public class PhotoMosaicFrame extends JFrame {
     private JTextField backgroundImagePath;
     private JTextField tilesPath;
     private BufferedImage photoMosaic;
-    private JPanel imagePanel;
+    private JLabel pictureLabel;
 
     public PhotoMosaicFrame(PhotoMosaicFileChooser fileChooser, Controller controller) {
         super();
@@ -34,9 +34,8 @@ public class PhotoMosaicFrame extends JFrame {
         controller.setErrorPanel(errorPanel);
         add(errorPanel);
 
-        imagePanel = new JPanel();
-        imagePanel.setLayout(new BorderLayout());
-        add(imagePanel, BorderLayout.CENTER);
+        pictureLabel = new JLabel();
+        add(pictureLabel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         setUpButtonPanel(buttonPanel);
@@ -118,11 +117,8 @@ public class PhotoMosaicFrame extends JFrame {
 //        thread.start();
 //        thread.setShouldUpdate(true);
         JLabel loading = new JLabel("Something great is coming your way!");
-        imagePanel.add(loading, BorderLayout.CENTER);
         photoMosaic = controller.getPhotoMosaic();
-        JLabel pictureLabel = new JLabel(new ImageIcon(photoMosaic));
-        imagePanel.remove(loading);
-        imagePanel.add(pictureLabel, BorderLayout.CENTER);
+        pictureLabel.setIcon(new ImageIcon(photoMosaic));
 //        thread.setShouldUpdate(false);
     }
 }
