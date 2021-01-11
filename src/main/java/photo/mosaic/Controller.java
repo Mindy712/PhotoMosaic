@@ -1,11 +1,9 @@
 package photo.mosaic;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
 
 public class Controller {
     private PhotoMosaicFileChooser fileChooser;
@@ -119,7 +117,7 @@ public class Controller {
         }
     }
 
-    public void setBackgroundImage(String imagePath) {
+    private void setBackgroundImage(String imagePath) {
         backgroundImage = pixelator.resizeBackgroundImage(imagePath);
     }
 }
