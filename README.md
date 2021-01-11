@@ -1,4 +1,4 @@
-#Photo Mosaic Generator
+# Photo Mosaic Generator
 The idea and algorithm for this project came from 
 https://robertheaton.com/2018/11/03/programming-project-4-photomosaics/.
 
