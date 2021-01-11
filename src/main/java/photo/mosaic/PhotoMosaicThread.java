@@ -1,40 +1,34 @@
 package photo.mosaic;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class PhotoMosaicThread extends Thread {
-    private JPanel imagePanel;
     private Controller controller;
-    private BufferedImage photoMosaic;
-    private JFrame frame;
+    private PhotoMosaicFrame frame;
+    private JLabel pictureLabel;
+    private ImageIcon loadingIndicatorImage;
+    private JButton generateMosaic;
 
-    private boolean shouldUpdate;
-
-    public PhotoMosaicThread(JFrame frame, JPanel imagePanel, Controller controller, BufferedImage photoMosaic) {
-        this.frame = frame;
-        this.imagePanel = imagePanel;
+    public PhotoMosaicThread(Controller controller,
+                             PhotoMosaicFrame frame,
+                             JLabel pictureLabel,
+                             ImageIcon loadingIndicatorImage,
+                             JButton generateMosaic) {
         this.controller = controller;
-        this.photoMosaic = photoMosaic;
+        this.frame = frame;
+        this.pictureLabel = pictureLabel;
+        this.loadingIndicatorImage = loadingIndicatorImage;
+        this.generateMosaic = generateMosaic;
     }
 
     public void run() {
-        JLabel loading = new JLabel("Something great is coming your way!");
-        imagePanel.add(loading, BorderLayout.CENTER);
-        frame.repaint();
-        photoMosaic = controller.getPhotoMosaic();
-        JLabel pictureLabel = new JLabel(new ImageIcon(photoMosaic));
-        imagePanel.remove(loading);
-        imagePanel.add(pictureLabel, BorderLayout.CENTER);
-        frame.repaint();
-    }
-
-    public void setImagePanel(JPanel imagePanel) {
-        this.imagePanel = imagePanel;
-    }
-
-    public void setShouldUpdate(boolean shouldUpdate) {
-        this.shouldUpdate = shouldUpdate;
+        generateMosaic.setEnabled(false);
+        pictureLabel.setIcon(loadingIndicatorImage);
+        BufferedImage photoMosaic = controller.getPhotoMosaic();
+        frame.setPhotoMosaic(photoMosaic);
+        ImageIcon imageIcon = new ImageIcon(photoMosaic.getScaledInstance(950, 650, java.awt.Image.SCALE_SMOOTH));
+        pictureLabel.setIcon(imageIcon);
+        generateMosaic.setEnabled(true);
     }
 }

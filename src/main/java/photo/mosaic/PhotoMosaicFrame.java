@@ -8,18 +8,19 @@ public class PhotoMosaicFrame extends JFrame {
     private JPanel errorPanel = new JPanel();
     private final PhotoMosaicFileChooser fileChooser;
     private Controller controller;
-//    private PhotoMosaicThread thread;
     private JTextField backgroundImagePath;
     private JTextField tilesPath;
-    private BufferedImage photoMosaic;
+    private JButton generateMosaic;
     private JLabel pictureLabel;
+    private JComboBox<Integer> opacity;
+    private BufferedImage photoMosaic;
+    private ImageIcon loadingIndicatorImage = new ImageIcon("Images/ajax-loader.gif");
 
     public PhotoMosaicFrame(PhotoMosaicFileChooser fileChooser, Controller controller) {
         super();
 
         this.fileChooser = fileChooser;
         this.controller = controller;
-//        this.thread = thread;
 
         setSize(1000, 800);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -35,20 +36,19 @@ public class PhotoMosaicFrame extends JFrame {
         add(errorPanel);
 
         pictureLabel = new JLabel();
+        pictureLabel.setHorizontalAlignment(JLabel.CENTER);
         add(pictureLabel, BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
         setUpButtonPanel(buttonPanel);
         add(buttonPanel, BorderLayout.SOUTH);
-
-//        thread.setImagePanel(imagePanel);
     }
 
     private void setUpFilesPanel(JPanel filesPanel) {
         filesPanel.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
 
-        JLabel backgroundImageLabel = new JLabel("Please select a background image: ");
+        JLabel backgroundImageLabel = new JLabel("*Please select a background image: ");
         constraints.gridx = 0;
         constraints.gridy = 0;
         filesPanel.add(backgroundImageLabel, constraints);
@@ -57,16 +57,15 @@ public class PhotoMosaicFrame extends JFrame {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
         constraints.gridy = 1;
-        constraints.gridwidth = 10;
         filesPanel.add(backgroundImagePath, constraints);
 
         JButton browseBackgroundImage = new JButton("Browse");
         browseBackgroundImage.addActionListener(actionEvent -> fileChooser.chooseFile());
-        constraints.gridx = 10;
+        constraints.gridx = 2;
         constraints.gridy = 1;
         filesPanel.add(browseBackgroundImage, constraints);
 
-        JLabel tilesLabel = new JLabel("Please select a folder with the tiles you would like (100 minimum): ");
+        JLabel tilesLabel = new JLabel("*Please select a folder with the tiles you would like (100 minimum): ");
         constraints.gridx = 0;
         constraints.gridy = 2;
         filesPanel.add(tilesLabel, constraints);
@@ -75,20 +74,47 @@ public class PhotoMosaicFrame extends JFrame {
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
         constraints.gridy = 3;
-        constraints.gridwidth = 10;
         filesPanel.add(tilesPath, constraints);
 
         JButton browseTiles = new JButton("Browse");
         browseTiles.addActionListener(actionEvent -> fileChooser.chooseFolder());
-        constraints.gridx = 10;
+        constraints.gridx = 2;
         constraints.gridy = 3;
         filesPanel.add(browseTiles, constraints);
 
-        JButton generateMosaic = new JButton("Generate Photo Mosaic");
+        JPanel opacityPanel = new JPanel();
+        setUpOpacityPanel(constraints, opacityPanel);
+        filesPanel.add(opacityPanel, constraints);
+
+        generateMosaic = new JButton("Generate Photo Mosaic");
         generateMosaic.addActionListener(actionEvent -> generateNewMosaic());
         constraints.gridx = 0;
-        constraints.gridy = 4;
+        constraints.gridy = 5;
         filesPanel.add(generateMosaic, constraints);
+    }
+
+    private void setUpOpacityPanel(GridBagConstraints constraints, JPanel opacityPanel) {
+        opacityPanel.setLayout(new FlowLayout());
+        JLabel opacityLabel = new JLabel("(Optional) Choose opacity of the tiles: " +
+                "(1 is least opaque, 10 is most opaque)");
+        opacityPanel.add(opacityLabel);
+
+        opacity = new JComboBox<>();
+        opacity.addItem(1);
+        opacity.addItem(2);
+        opacity.addItem(3);
+        opacity.addItem(4);
+        opacity.addItem(5);
+        opacity.addItem(6);
+        opacity.addItem(7);
+        opacity.addItem(8);
+        opacity.addItem(9);
+        opacity.addItem(10);
+        opacity.setSelectedIndex(9);
+        opacityPanel.add(opacity);
+
+        constraints.gridx = 0;
+        constraints.gridy = 4;
     }
 
     private void setUpButtonPanel(JPanel buttonPanel) {
@@ -108,17 +134,17 @@ public class PhotoMosaicFrame extends JFrame {
                     "Please choose valid files for the background image and tiles.");
         }
         else {
-            displayInImagePanel();
+            controller.setOpacity(opacity.getSelectedIndex() + 1);
+            PhotoMosaicThread thread = new PhotoMosaicThread(controller,
+                                                                this,
+                                                                pictureLabel,
+                                                                loadingIndicatorImage,
+                                                                generateMosaic);
+            thread.start();
         }
     }
 
-    private void displayInImagePanel() {
-//        PhotoMosaicThread thread = new PhotoMosaicThread(this, imagePanel, controller, photoMosaic);
-//        thread.start();
-//        thread.setShouldUpdate(true);
-        JLabel loading = new JLabel("Something great is coming your way!");
-        photoMosaic = controller.getPhotoMosaic();
-        pictureLabel.setIcon(new ImageIcon(photoMosaic));
-//        thread.setShouldUpdate(false);
+    public void setPhotoMosaic(BufferedImage photoMosaic) {
+        this.photoMosaic = photoMosaic;
     }
 }
