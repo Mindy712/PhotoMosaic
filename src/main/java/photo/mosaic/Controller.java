@@ -10,6 +10,7 @@ public class Controller {
     private BufferedImage backgroundImage;
     private Pixelator pixelator;
     private JPanel errorPanel;
+    private double opacity;
 
     public Controller(PhotoMosaicFileChooser fileChooser) {
         this.fileChooser = fileChooser;
@@ -17,6 +18,10 @@ public class Controller {
 
     public void setErrorPanel(JPanel errorPanel) {
         this.errorPanel = errorPanel;
+    }
+
+    public void setOpacity(double opacity) {
+        this.opacity = opacity / 10.0;
     }
 
     public BufferedImage getPhotoMosaic() {
@@ -104,7 +109,7 @@ public class Controller {
         BufferedImage resizedTile = getResizedTile(pixel.getTile());
         addImage(backgroundImage,
                 resizedTile,
-                (float) 1.0,
+                (float) opacity,
                 pixel.getPixelInImageWidth() * pixelator.getWidthOfPixelBg(),
                 pixel.getPixelInImageHeight() * pixelator.getHeightOfPixelBg());
     }

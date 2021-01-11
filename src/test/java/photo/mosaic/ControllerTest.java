@@ -16,8 +16,8 @@ public class ControllerTest {
         //given
         PhotoMosaicFileChooser fileChooser = mock(PhotoMosaicFileChooser.class);
         Controller controller = new Controller(fileChooser);
-        doReturn("PhotoMosaicPics/car-race-438467_1280.jpg").when(fileChooser).getBackgroundImagePath();
-        doReturn("PhotoMosaicPics/Tiles").when(fileChooser).getTilesPath();
+        doReturn("Images/PhotoMosaicPics/BackgroundImage.jpg").when(fileChooser).getBackgroundImagePath();
+        doReturn("Images/PhotoMosaicPics/Tiles").when(fileChooser).getTilesPath();
         doReturn(100).when(fileChooser).getNumTiles();
 
         //when
@@ -25,6 +25,6 @@ public class ControllerTest {
 
         //then
         assertNotNull(photoMosaic);
-        ImageIO.write(photoMosaic, "png", new File("PhotoMosaicPics/PhotoMosaicTest.png"));
+        ImageIO.write(photoMosaic, "png", new File("Images/PhotoMosaicPics/PhotoMosaicTest.png"));
     }
 }
