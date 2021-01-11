@@ -4,9 +4,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class PixelInBackgroundImage {
+    //Pixel in the background image that this PixelInBackgroundImage represents
     private int pixelInImageWidth;
     private int pixelInImageHeight;
+
+    //Color of this pixel
     private Color color;
+
+    //Tile that will go in this pixel
     private BufferedImage tile;
 
     public PixelInBackgroundImage(int row, int col, Color color) {

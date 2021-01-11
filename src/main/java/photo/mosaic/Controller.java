@@ -25,6 +25,8 @@ public class Controller {
         setBackgroundImage(fileChooser.getBackgroundImagePath());
         PixelInBackgroundImage[][] backgroundPixels = getBackgroundPixels();
         TileImage[] tiles = setTiles(fileChooser.getNumTiles());
+
+        //For each pixel in background photo, find the tile that best matches its color
         for (int width = 0; width < backgroundPixels.length; width++) {
             for (int height = 0; height < backgroundPixels[width].length; height++) {
                 Color backgroundPixelColor = backgroundPixels[width][height].getColor();
@@ -32,7 +34,7 @@ public class Controller {
                 double euclideanDistance;
                 int closestTile = 0;
                 for (int ix = 0; ix < tiles.length; ix++) {
-                    euclideanDistance = getEuclideanDistance(backgroundPixelColor, tiles[ix].getMeanColor());
+                    euclideanDistance = getEuclideanDistance(backgroundPixelColor, tiles[ix].getAverageColor());
                     if (euclideanDistance < closestEuclideanDistance || closestEuclideanDistance == 0.0) {
                         closestEuclideanDistance = euclideanDistance;
                         closestTile = ix;
@@ -45,44 +47,8 @@ public class Controller {
          return backgroundImage;
     }
 
-    private double getEuclideanDistance(Color backgroundPixelColor, Color tileColor) {
-        double reds = (tileColor.getRed() - backgroundPixelColor.getRed()) *
-                (tileColor.getRed() - backgroundPixelColor.getRed());
-        double greens = (tileColor.getGreen() - backgroundPixelColor.getGreen()) *
-                (tileColor.getGreen() - backgroundPixelColor.getGreen());
-        double blues = (tileColor.getBlue() - backgroundPixelColor.getBlue()) *
-                (tileColor.getBlue() - backgroundPixelColor.getBlue());
-        return Math.sqrt(reds + greens + blues);
-    }
-
-    private void addTileToBackgroundImage(PixelInBackgroundImage pixel) {
-        BufferedImage resizedTile = getResizedTile(pixel.getTile());
-        addImage(backgroundImage,
-                resizedTile,
-                (float) 1.0,
-                pixel.getPixelInImageWidth() * pixelator.getWidthOfPixelBg(),
-                pixel.getPixelInImageHeight() * pixelator.getHeightOfPixelBg());
-    }
-
-    private BufferedImage getResizedTile(BufferedImage tile) {
-        int widthPixel = pixelator.getWidthOfPixelBg();
-        int heightPixel = pixelator.getHeightOfPixelBg();
-        Image resizedImg = tile.getScaledInstance(widthPixel, heightPixel, java.awt.Image.SCALE_SMOOTH);
-        BufferedImage bufferedImg = new BufferedImage(widthPixel, heightPixel, BufferedImage.TYPE_INT_RGB);
-        bufferedImg.getGraphics().drawImage(resizedImg, 0, 0 , null);
-        return bufferedImg;
-    }
-
-    /**
-     * prints the contents of tile on bgImage with the given opaque value.
-     */
-    private void addImage(BufferedImage bgImage, BufferedImage tile,
-                          float opaque, int pixelX, int pixelY) {
-        Graphics2D g2d = bgImage.createGraphics();
-        g2d.setComposite(
-                AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opaque));
-        g2d.drawImage(tile, pixelX, pixelY, null);
-        g2d.dispose();
+    private void setBackgroundImage(String imagePath) {
+        backgroundImage = pixelator.resizeBackgroundImage(imagePath);
     }
 
     private PixelInBackgroundImage[][] getBackgroundPixels() {
@@ -117,7 +83,61 @@ public class Controller {
         }
     }
 
-    private void setBackgroundImage(String imagePath) {
-        backgroundImage = pixelator.resizeBackgroundImage(imagePath);
+    /**
+     * @param backgroundPixelColor
+     * @param tileColor
+     *
+     * Measure similarities of two colors
+     * @return a smaller number for more similar colors and a larger for less similar
+     */
+    private double getEuclideanDistance(Color backgroundPixelColor, Color tileColor) {
+        double reds = (tileColor.getRed() - backgroundPixelColor.getRed()) *
+                (tileColor.getRed() - backgroundPixelColor.getRed());
+        double greens = (tileColor.getGreen() - backgroundPixelColor.getGreen()) *
+                (tileColor.getGreen() - backgroundPixelColor.getGreen());
+        double blues = (tileColor.getBlue() - backgroundPixelColor.getBlue()) *
+                (tileColor.getBlue() - backgroundPixelColor.getBlue());
+        return Math.sqrt(reds + greens + blues);
+    }
+
+    private void addTileToBackgroundImage(PixelInBackgroundImage pixel) {
+        BufferedImage resizedTile = getResizedTile(pixel.getTile());
+        addImage(backgroundImage,
+                resizedTile,
+                (float) 1.0,
+                pixel.getPixelInImageWidth() * pixelator.getWidthOfPixelBg(),
+                pixel.getPixelInImageHeight() * pixelator.getHeightOfPixelBg());
+    }
+
+    /**
+     * @param tile
+     * @return resized tile that is the size of one pixel in the background image
+     */
+    private BufferedImage getResizedTile(BufferedImage tile) {
+        int widthPixel = pixelator.getWidthOfPixelBg();
+        int heightPixel = pixelator.getHeightOfPixelBg();
+        Image resizedImg = tile.getScaledInstance(widthPixel, heightPixel, java.awt.Image.SCALE_SMOOTH);
+        BufferedImage bufferedImg = new BufferedImage(widthPixel, heightPixel, BufferedImage.TYPE_INT_RGB);
+        bufferedImg.getGraphics().drawImage(resizedImg, 0, 0 , null);
+        return bufferedImg;
+    }
+
+    /**
+     * @param bgImage
+     * @param tile
+     * @param opaque
+     * @param pixelX
+     * @param pixelY
+     *
+     * Prints the contents of tile on bgImage with the given opaque value
+     * Begins at the pixelX and pixelY specified
+     */
+    private void addImage(BufferedImage bgImage, BufferedImage tile,
+                          float opaque, int pixelX, int pixelY) {
+        Graphics2D g2d = bgImage.createGraphics();
+        g2d.setComposite(
+                AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opaque));
+        g2d.drawImage(tile, pixelX, pixelY, null);
+        g2d.dispose();
     }
 }

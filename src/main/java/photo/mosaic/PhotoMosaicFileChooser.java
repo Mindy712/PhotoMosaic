@@ -8,6 +8,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Allow users to choose a file from their system directory
+ */
 public class PhotoMosaicFileChooser {
     private final JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView());
     private final int minNumTiles = 100;
@@ -24,6 +27,9 @@ public class PhotoMosaicFileChooser {
         this.folderPath = folderPath;
     }
 
+    /**
+     * Choose file for background image. Only allows image files
+     */
     public void chooseFile() {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("Image Files", "jpg", "png", "gif", "jpeg");
         fileChooser.setFileFilter(filter);
@@ -37,6 +43,9 @@ public class PhotoMosaicFileChooser {
         }
     }
 
+    /**
+     * Choose directory for tiles. Only allows directories that have a minimum of 100 photos
+     */
     public void chooseFolder() {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int folder = fileChooser.showOpenDialog(null);
@@ -54,6 +63,11 @@ public class PhotoMosaicFileChooser {
         }
     }
 
+    /**
+     * @param tileDirectory
+     * Checks if given directory contains at least 100 images
+     * @return true if there are at least 100 images, false if not
+     */
     private boolean directoryHas100Images(File tileDirectory) {
         int total = 0;
         for (File file : tileDirectory.listFiles()) {
@@ -95,24 +109,17 @@ public class PhotoMosaicFileChooser {
         this.tilesPath = tilesPath;
     }
 
+    /**
+     * Checks if the paths chosen are still valid
+     * Needed in case user changed them from when they chose the files, or if they inputted them manually
+     * @return
+     */
     public boolean pathsAreValid() {
-        File bg;
-        File tiles;
-        if (getBackgroundImagePath() != null) {
-            bg = new File(getBackgroundImagePath());
-        }
-        else {
-            backgroundImagePath = filePath.getText();
-            bg = new File(backgroundImagePath);
-        }
+        backgroundImagePath = filePath.getText();
+        File bg = new File(backgroundImagePath);
 
-        if (getTilesPath() != null) {
-            tiles = new File(getTilesPath());
-        }
-        else {
-            tilesPath = folderPath.getText();
-            tiles = new File(tilesPath);
-        }
+        tilesPath = folderPath.getText();
+        File tiles = new File(tilesPath);
 
         if (bg.isFile() && tiles.isDirectory() && directoryHas100Images(tiles)) {
             return true;
@@ -122,6 +129,10 @@ public class PhotoMosaicFileChooser {
         }
     }
 
+    /**
+     * @param photoMosaic
+     * Save the photoMosaic where the user specifies, as a png.
+     */
     public void save(BufferedImage photoMosaic) {
         if (photoMosaic == null) {
             JOptionPane.showMessageDialog(errorPanel, "You need a photo mosaic to save first.");
@@ -136,6 +147,7 @@ public class PhotoMosaicFileChooser {
 
                 try {
                     String fileName = selectedFile.getAbsolutePath();
+                    //If there is already any extension, remove it
                     if (fileName.contains(".")) {
                         fileName = fileName.substring(0, fileName.indexOf("."));
                     }
