@@ -3,7 +3,6 @@ package photo.mosaic;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.net.URL;
 
 public class PhotoMosaicFrame extends JFrame {
     private JPanel errorPanel = new JPanel();
