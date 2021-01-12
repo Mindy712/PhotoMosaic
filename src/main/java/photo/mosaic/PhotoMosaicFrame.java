@@ -3,6 +3,7 @@ package photo.mosaic;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.net.URL;
 
 public class PhotoMosaicFrame extends JFrame {
     private JPanel errorPanel = new JPanel();
@@ -14,7 +15,7 @@ public class PhotoMosaicFrame extends JFrame {
     private JLabel pictureLabel;
     private JComboBox<Integer> opacity;
     private BufferedImage photoMosaic;
-    private ImageIcon loadingIndicatorImage = new ImageIcon("Images/ajax-loader.gif");
+    private ImageIcon loadingIndicatorImage;
 
     public PhotoMosaicFrame(PhotoMosaicFileChooser fileChooser, Controller controller) {
         super();
@@ -42,6 +43,8 @@ public class PhotoMosaicFrame extends JFrame {
         JPanel buttonPanel = new JPanel();
         setUpButtonPanel(buttonPanel);
         add(buttonPanel, BorderLayout.SOUTH);
+
+        loadingIndicatorImage = new ImageIcon(getClass().getResource("/ajax-loader.gif"));
     }
 
     private void setUpFilesPanel(JPanel filesPanel) {
