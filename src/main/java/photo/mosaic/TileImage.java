@@ -5,10 +5,10 @@ import java.awt.image.BufferedImage;
 
 public class TileImage {
     //Average color of this tile
-    private Color averageColor;
+    private final Color averageColor;
 
     //Image that is this this tile
-    private BufferedImage tile;
+    private final BufferedImage tile;
 
     public BufferedImage getTile() {
         return tile;

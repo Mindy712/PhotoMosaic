@@ -24,9 +24,9 @@ public class Pixelator {
 
     //Arraylists used to store the reds, greens, and blues of all the pixels in the image
     //Used to find the average color
-    private ArrayList<Integer> reds = new ArrayList<>();
-    private ArrayList<Integer> greens = new ArrayList<>();
-    private ArrayList<Integer> blues = new ArrayList<>();
+    private final ArrayList<Integer> reds = new ArrayList<>();
+    private final ArrayList<Integer> greens = new ArrayList<>();
+    private final ArrayList<Integer> blues = new ArrayList<>();
 
     public void setErrorPanel(JPanel errorPanel) {
         this.errorPanel = errorPanel;
@@ -77,8 +77,7 @@ public class Pixelator {
     }
 
     public PixelInBackgroundImage[][] pixelateBgImage(BufferedImage image) {
-        PixelInBackgroundImage[][] pixels = getBgImageArray(image);
-        return pixels;
+        return getBgImageArray(image);
     }
 
     public TileImage pixelateTile(File imageFile) {
@@ -143,9 +142,9 @@ public class Pixelator {
         reds.clear();
         greens.clear();
         blues.clear();
-        for (int row = 0; row < pixels.length; row ++) {
-            for (int col = 0; col < pixels[row].length; col++) {
-                Color color = new Color(pixels[row][col]);
+        for (int[] width : pixels) {
+            for (int height : width) {
+                Color color = new Color(height);
                 reds.add(color.getRed());
                 greens.add(color.getGreen());
                 blues.add(color.getBlue());

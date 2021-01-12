@@ -4,11 +4,11 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 
 public class PhotoMosaicThread extends Thread {
-    private Controller controller;
-    private PhotoMosaicFrame frame;
-    private JLabel pictureLabel;
-    private ImageIcon loadingIndicatorImage;
-    private JButton generateMosaic;
+    private final Controller controller;
+    private final PhotoMosaicFrame frame;
+    private final JLabel pictureLabel;
+    private final ImageIcon loadingIndicatorImage;
+    private final JButton generateMosaic;
 
     public PhotoMosaicThread(Controller controller,
                              PhotoMosaicFrame frame,

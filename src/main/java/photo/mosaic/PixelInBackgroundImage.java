@@ -5,11 +5,11 @@ import java.awt.image.BufferedImage;
 
 public class PixelInBackgroundImage {
     //Pixel in the background image that this PixelInBackgroundImage represents
-    private int pixelInImageWidth;
-    private int pixelInImageHeight;
+    private final int pixelInImageWidth;
+    private final int pixelInImageHeight;
 
     //Color of this pixel
-    private Color color;
+    private final Color color;
 
     //Tile that will go in this pixel
     private BufferedImage tile;

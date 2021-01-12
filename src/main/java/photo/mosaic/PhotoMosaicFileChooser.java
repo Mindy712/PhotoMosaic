@@ -121,12 +121,7 @@ public class PhotoMosaicFileChooser {
         tilesPath = folderPath.getText();
         File tiles = new File(tilesPath);
 
-        if (bg.isFile() && tiles.isDirectory() && directoryHas100Images(tiles)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return bg.isFile() && tiles.isDirectory() && directoryHas100Images(tiles);
     }
 
     /**

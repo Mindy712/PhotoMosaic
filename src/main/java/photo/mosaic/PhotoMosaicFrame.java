@@ -5,16 +5,16 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 public class PhotoMosaicFrame extends JFrame {
-    private JPanel errorPanel = new JPanel();
+    private final JPanel errorPanel = new JPanel();
     private final PhotoMosaicFileChooser fileChooser;
-    private Controller controller;
+    private final Controller controller;
     private JTextField backgroundImagePath;
     private JTextField tilesPath;
     private JButton generateMosaic;
-    private JLabel pictureLabel;
+    private final JLabel pictureLabel;
     private JComboBox<Integer> opacity;
     private BufferedImage photoMosaic;
-    private ImageIcon loadingIndicatorImage;
+    private final ImageIcon loadingIndicatorImage;
 
     public PhotoMosaicFrame(PhotoMosaicFileChooser fileChooser, Controller controller) {
         super();
