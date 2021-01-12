@@ -9,6 +9,16 @@ repositories {
     mavenCentral()
 }
 
+//https://stackoverflow.com/questions/4871656/using-gradle-to-build-a-jar-with-dependencies/4894308#4894308
+jar {
+    manifest {
+        attributes "Main-Class": "photo.mosaic.PhotoMosaicMain"
+    }
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testImplementation 'org.mockito:mockito-core:3.5.5'

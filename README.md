@@ -36,3 +36,11 @@ For convenience of being able to test out this application,
 I have included a folder [here](Images/PhotoMosaicPics) that
 has the background image I used, and the folder of
 100 tiles.
+
+Note: For users running the executable of this 
+application on MacOS, there may be security
+ limitations regarding the local files that can be accessed
+from the application. If this issue is encountered,
+it can be circumvented by running the jar as root.
+(See [this article](https://stackoverflow.com/questions/18176228/run-jar-with-root-privileges-on-mac-os-x-by-one-click)
+for ways to do that.)
