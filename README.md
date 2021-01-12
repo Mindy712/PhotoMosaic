@@ -37,7 +37,8 @@ I have included a folder [here](Images/PhotoMosaicPics) that
 has the background image I used, and the folder of
 100 tiles.
 
-Note: For users running the executable of this 
+### Note:
+For users running the executable of this 
 application on MacOS, there may be security
  limitations regarding the local files that can be accessed
 from the application. If this issue is encountered,
