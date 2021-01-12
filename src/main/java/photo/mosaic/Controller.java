@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class Controller {
-    private PhotoMosaicFileChooser fileChooser;
+    private final PhotoMosaicFileChooser fileChooser;
     private BufferedImage backgroundImage;
     private Pixelator pixelator;
     private JPanel errorPanel;
@@ -32,9 +32,9 @@ public class Controller {
         TileImage[] tiles = setTiles(fileChooser.getNumTiles());
 
         //For each pixel in background photo, find the tile that best matches its color
-        for (int width = 0; width < backgroundPixels.length; width++) {
-            for (int height = 0; height < backgroundPixels[width].length; height++) {
-                Color backgroundPixelColor = backgroundPixels[width][height].getColor();
+        for (PixelInBackgroundImage[] backgroundPixelWidth : backgroundPixels) {
+            for (PixelInBackgroundImage backgroundPixelHeight : backgroundPixelWidth) {
+                Color backgroundPixelColor = backgroundPixelHeight.getColor();
                 double closestEuclideanDistance = 0.0;
                 double euclideanDistance;
                 int closestTile = 0;
@@ -45,10 +45,10 @@ public class Controller {
                         closestTile = ix;
                     }
                 }
-                backgroundPixels[width][height].setTile(tiles[closestTile].getTile());
-                addTileToBackgroundImage(backgroundPixels[width][height]);
+                backgroundPixelHeight.setTile(tiles[closestTile].getTile());
+                addTileToBackgroundImage(backgroundPixelHeight);
             }
-         }
+        }
          return backgroundImage;
     }
 
@@ -65,9 +65,9 @@ public class Controller {
         File directory = new File(fileChooser.getTilesPath());
         File[] tilesPath = directory.listFiles();
         int tileUpTo = 0;
-        for (int ix = 0; ix < tilesPath.length; ix++) {
-            if (isImageFile(tilesPath[ix])) {
-                TileImage tile = pixelator.pixelateTile(tilesPath[ix]);
+        for (File file : tilesPath) {
+            if (isImageFile(file)) {
+                TileImage tile = pixelator.pixelateTile(file);
                 tiles[tileUpTo] = tile;
                 tileUpTo++;
             }
@@ -76,16 +76,10 @@ public class Controller {
     }
 
     private boolean isImageFile(File file) {
-        if (file.getName().endsWith(".jpg") ||
+        return file.getName().endsWith(".jpg") ||
                 file.getName().endsWith(".png") ||
                 file.getName().endsWith(".gif") ||
-                file.getName().endsWith(".jpeg"))
-        {
-            return true;
-        }
-        else {
-            return false;
-        }
+                file.getName().endsWith(".jpeg");
     }
 
     /**
