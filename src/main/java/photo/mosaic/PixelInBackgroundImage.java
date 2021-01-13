@@ -14,9 +14,9 @@ public class PixelInBackgroundImage {
     //Tile that will go in this pixel
     private BufferedImage tile;
 
-    public PixelInBackgroundImage(int row, int col, Color color) {
-        this.pixelInImageWidth = row;
-        this.pixelInImageHeight = col;
+    public PixelInBackgroundImage(int width, int height, Color color) {
+        this.pixelInImageWidth = width;
+        this.pixelInImageHeight = height;
         this.color = color;
     }
 

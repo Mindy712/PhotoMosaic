@@ -6,7 +6,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Pixelator class takes an image and gets the RGB values for the pixels of that image
@@ -21,12 +20,6 @@ public class Pixelator {
     //number of pixels in both the width and height of the background image
     private final int pixelsInWidthBg = 50;
     private final int pixelsInHeightBg = 50;
-
-    //Arraylists used to store the reds, greens, and blues of all the pixels in the image
-    //Used to find the average color
-    private final ArrayList<Integer> reds = new ArrayList<>();
-    private final ArrayList<Integer> greens = new ArrayList<>();
-    private final ArrayList<Integer> blues = new ArrayList<>();
 
     public void setErrorPanel(JPanel errorPanel) {
         this.errorPanel = errorPanel;
@@ -139,27 +132,19 @@ public class Pixelator {
      * @return Color based on the averages calculated
      */
     private Color calculateAverageColor(int[][] pixels) {
-        reds.clear();
-        greens.clear();
-        blues.clear();
-        for (int[] width : pixels) {
-            for (int height : width) {
-                Color color = new Color(height);
-                reds.add(color.getRed());
-                greens.add(color.getGreen());
-                blues.add(color.getBlue());
-            }
-        }
-
-        int total = reds.size();
+        int total = 0;
         int sumReds = 0;
         int sumGreens = 0;
         int sumBlues = 0;
 
-        for (int ix = 0; ix < total; ix++) {
-            sumReds += reds.get(ix);
-            sumGreens += greens.get(ix);
-            sumBlues += blues.get(ix);
+        for (int[] width : pixels) {
+            for (int height : width) {
+                Color color = new Color(height);
+                sumReds += color.getRed();
+                sumGreens += color.getGreen();
+                sumBlues += color.getBlue();
+                total++;
+            }
         }
 
         int red = sumReds / total;
